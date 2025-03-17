@@ -6,6 +6,8 @@ using UnityEngine;
 * two players first:
 * map custom input in unity editor
 * edit > project settings > input manager > new axes for "Horizontal" and "Vertical"
+*
+* CONTROLS PLAYER MOVEMENT
 */
 public class PlayerController : MonoBehaviour
 {
@@ -30,8 +32,23 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // get input from horizontal and vertical axes
-        movement.x = Input.GetAxisRaw(horizontalInput);
-        movement.z = Input.GetAxisRaw(verticalInput);
+        float horizontal = Input.GetAxisRaw(horizontalInput);
+        float vertical = Input.GetAxisRaw(verticalInput);
+
+        // get camera's rotation
+        Vector3 cameraForward = Camera.main.transform.forward; // camera's forward vector
+        Vector3 cameraRight = Camera.main.transform.right; // camera's right vector
+
+        // don't include Y-axis
+        cameraForward.y = 0;
+        cameraRight.y = 0;
+
+        // normalize to not get scaled movement
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        // adjust player's movement based on camera's orientation
+        movement = cameraForward * vertical + cameraRight * horizontal;
         movement = movement.normalized * moveSpeed * Time.deltaTime; // normalize to prevent faster diagonal movement, apply speed
 
         // jumping and gravity
