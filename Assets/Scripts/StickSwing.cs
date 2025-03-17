@@ -14,7 +14,7 @@ public class StickSwing : MonoBehaviour
     private bool isSwinging = false;
     private Quaternion originalRotation;
 
-    public float hitForce = 10f;
+    public float hitForce = 5f;
 
     void Start()
     {
@@ -67,18 +67,22 @@ public class StickSwing : MonoBehaviour
         isSwinging = false; // finish swinging
     }
 
-    void OnTriggerEnter(Collider other)
+    // interact with volleyball
+    void OnTriggerEnter(Collider ball)
     {
-        if (other.CompareTag("Ball")) // volleybaoo has "Ball" tag
+        if (ball.CompareTag("Ball")) // volleybaoo has "Ball" tag
         {
-            BallController ballController = other.GetComponent<BallController>(); // get BallController component from ball
+            BallController ballController = ball.GetComponent<BallController>(); // get BallController component from ball
 
-            if (ballController != null)
+            if (ballController != null && isSwinging) // THEN, HIT THE BALL
             {
-                Vector3 hitDirection = (other.transform.position - transform.position).normalized; // find direction from stick to the ball
-                hitDirection.y = 0.5f; // ball moves slightly upward when hit
+                // calculate hit direction
+                Vector3 hitDirection = ball.transform.position - stickTransform.position;
+                hitDirection = hitDirection.normalized; // make direction unit vector
+                hitDirection.y = 0.5f; // make the ball go slightly upwards after the hit
 
-                ballController.ApplyHitForce(hitDirection, hitForce); // apply force to ball
+                // apply force to ball with the new direction
+                ballController.ApplyHitForce(hitDirection, hitForce);
             }
         }
     }

@@ -8,10 +8,15 @@ using UnityEngine;
  */
 public class BallController : MonoBehaviour
 {
-    public float hitForce = 5f;
-    public float bounceForce = 5f;
+    public float bounceForce = 2f;
     public float drag = 0.5f;
     private Rigidbody rb;
+
+    private Vector3 initialPosition;
+
+    // reference to court dimensions
+    public float courtWidth = 12.18f;
+    public float courtDepth = 21.02f;
 
     void Start()
     {
@@ -19,6 +24,22 @@ public class BallController : MonoBehaviour
         rb.useGravity = true; // re-enable gravity
         rb.drag = drag; // smoother, slower movement
         rb.angularDrag = drag; // natural spin
+
+        initialPosition = transform.position;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+            ResetBallPosition();
+    }
+
+    // for playtesting
+    public void ResetBallPosition()
+    {
+        transform.position = initialPosition;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
     }
 
     // when ball is hit by player or object
