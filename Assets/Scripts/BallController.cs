@@ -8,7 +8,6 @@ using UnityEngine;
  */
 public class BallController : MonoBehaviour
 {
-    public float bounceForce = 2f;
     public float drag = 0.5f;
     private Rigidbody rb;
 
@@ -51,17 +50,5 @@ public class BallController : MonoBehaviour
         rb.angularVelocity = Vector3.zero; // prevent unwanted spin
 
         rb.AddForce(direction * hitStrength, ForceMode.Impulse);
-    }
-
-    // collision logic (ball bounces off ground)
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("Ball collided with: " + collision.gameObject.name);
-        if (collision.relativeVelocity.magnitude > 1f)
-        {
-            // apply bounce effect
-            Vector3 bounce = Vector3.Reflect(rb.velocity, collision.contacts[0].normal);
-            rb.velocity = bounce * bounceForce;
-        }
     }
 }

@@ -77,13 +77,33 @@ public class StickSwing : MonoBehaviour
             if (ballController != null && isSwinging) // THEN, HIT THE BALL
             {
                 // calculate hit direction
-                Vector3 hitDirection = ball.transform.position - stickTransform.position;
-                hitDirection = hitDirection.normalized; // make direction unit vector
-                hitDirection.y = 0.5f; // make the ball go slightly upwards after the hit
+                Vector3 targetDirection = GetHitDirection(); // pseudo-random place to ensure landing within the court
+                Vector3 hitDirection = targetDirection.normalized; // make direction unit vector
+                hitDirection.y = 1f; // make the ball go slightly upwards after the hit
 
                 // apply force to ball with the new direction
                 ballController.ApplyHitForce(hitDirection, hitForce);
             }
         }
+    }
+
+    Vector3 GetHitDirection()
+    {
+        string playerTag = gameObject.tag; // "Player 1" or "Player 2"
+
+        // Define fixed landing positions for Player 1 and Player 2
+        Vector3 player1Target = new Vector3(0, 0, -10); // Target position on Player 2's side
+        Vector3 player2Target = new Vector3(0, 0, 10); // Target position on Player 1's side
+
+        if(playerTag == "Player 1")
+        {
+            return player1Target;
+        }
+        else if(playerTag == "Player 2")
+        {
+            return player2Target;
+        }
+
+        return Vector3.zero; // default
     }
 }
