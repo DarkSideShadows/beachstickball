@@ -45,12 +45,18 @@ public class BallController : MonoBehaviour
     // when ball is hit by player or object
     public void ApplyHitForce(Vector3 direction, float hitStrength)
     {
+        Debug.Log("Ball hit with stick");
+        Debug.Log("Applying force: " + direction * hitStrength);
+        rb.velocity = Vector3.zero; // reset velocity before applying force
+        rb.angularVelocity = Vector3.zero; // prevent unwanted spin
+
         rb.AddForce(direction * hitStrength, ForceMode.Impulse);
     }
 
     // collision logic (ball bounces off ground)
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Ball collided with: " + collision.gameObject.name);
         if (collision.relativeVelocity.magnitude > 1f)
         {
             // apply bounce effect

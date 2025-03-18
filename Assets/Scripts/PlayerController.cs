@@ -22,11 +22,18 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController controller;
     private Vector3 movement;
-    private float verticalVelocity; // (vertical + velocity)
+    private float verticalVelocity; // (movement speed)
+    public float rotationSpeed = 10f; // speed of character rotation when moving
+
+    public Transform characterModel; // reference to flamingo/frog character model
+    public Vector3 characterModelOffset = new Vector3(0f, 1f, 0f);  // offset to move the character model downwards
 
     void Awake()
     {
         controller = GetComponent<CharacterController>();
+
+        // center of collider to center of character model
+        controller.center = characterModel.position - transform.position + characterModelOffset;
     }
 
     void Update()
@@ -39,7 +46,7 @@ public class PlayerController : MonoBehaviour
         Vector3 cameraForward = Camera.main.transform.forward; // camera's forward vector
         Vector3 cameraRight = Camera.main.transform.right; // camera's right vector
 
-        // don't include Y-axis
+        // don't include Y-axis (vertical component)
         cameraForward.y = 0;
         cameraRight.y = 0;
 
@@ -48,8 +55,10 @@ public class PlayerController : MonoBehaviour
         cameraRight.Normalize();
 
         // adjust player's movement based on camera's orientation
-        movement = cameraForward * vertical + cameraRight * horizontal;
-        movement = movement.normalized * moveSpeed * Time.deltaTime; // normalize to prevent faster diagonal movement, apply speed
+        Vector3 movementDirection = cameraForward * vertical + cameraRight * horizontal;
+        movementDirection.Normalize(); // normalize to prevent faster diagonal movement
+
+        movement = movementDirection * moveSpeed * Time.deltaTime;
 
         // jumping and gravity
         if (controller.isGrounded)
@@ -66,5 +75,19 @@ public class PlayerController : MonoBehaviour
         // move player while handling collisions
         movement.y = verticalVelocity * Time.deltaTime;
         controller.Move(movement);
+
+        // align the character capsule to the root of the character model
+        if (characterModel != null)
+        {
+            Vector3 modelPosition = characterModel.position;
+            controller.transform.position = new Vector3(modelPosition.x, controller.transform.position.y, modelPosition.z);
+        }
+
+        // rotate the character based on movement direction
+        if (movementDirection.magnitude > 0.1f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(movementDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
     }
 }
