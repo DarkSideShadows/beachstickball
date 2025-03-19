@@ -1125,15 +1125,15 @@ GameObject:
   m_Component:
   - component: {fileID: 5285299612342542941}
   - component: {fileID: 4761139688710846489}
+  - component: {fileID: 4761139688710846494}
   - component: {fileID: 4761139688710846488}
   - component: {fileID: 4761139688710846490}
   - component: {fileID: 4761139688710846491}
   - component: {fileID: 4761139688710846492}
   - component: {fileID: 4761139688710846493}
-  - component: {fileID: 4761139688710846494}
-  - component: {fileID: -5648326588103747660}
   - component: {fileID: 4920186001925387351}
   - component: {fileID: -6970859521689363958}
+  - component: {fileID: -5648326588103747660}
   - component: {fileID: 3657268271319628686}
   m_Layer: 0
   m_Name: ARROW-FROG
@@ -1185,6 +1185,27 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4761139688710846494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4761139688710846695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 494679963
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &4761139688710846488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1352,39 +1373,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &4761139688710846494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4761139688710846695}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 494679963
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
---- !u!114 &-5648326588103747660
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4761139688710846695}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24e53d3e64848b044953f8c10fcac52c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4920186001925387351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1430,6 +1418,18 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &-5648326588103747660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4761139688710846695}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24e53d3e64848b044953f8c10fcac52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3657268271319628686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1437,7 +1437,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4761139688710846695}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba3b1d2e2db6d9d42b0b9f09839a825f, type: 3}
   m_Name: 

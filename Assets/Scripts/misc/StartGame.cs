@@ -28,7 +28,7 @@ public class StartGame : MonoBehaviour
     {
         // disable start screen and enable game objects
         startScreen.SetActive(false);
-        //gameObjects.SetActive(true);
+        gameObjects.SetActive(true);
 
         gameStarted = true;
     }

@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
+using beachstickball;
 
 /*
 * two players first:
 * map custom input in unity editor
 * edit > project settings > input manager > new axes for "Horizontal" and "Vertical"
 *
-* CONTROLS PLAYER MOVEMENT
+* CONTROLS PLAYER MOVEMENT - manages local player's input and movement (sent to beachstickballplayer for network sync)
 */
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     // constants for player movement
     public float moveSpeed = 5f;
@@ -35,12 +37,19 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         controller = GetComponent<CharacterController>();
-
-        // center of collider to center of character model
-        controller.center = characterModel.position - transform.position + characterModelOffset;
+        controller.center = characterModel.position - transform.position + characterModelOffset; // center of collider to center of character model
     }
 
     void Update()
+    {
+        if (IsOwner) // owner moves locally and sends updates to server
+        {
+            HandlePlayerMovement();
+            SubmitPositionRequestServerRpc(transform.position);
+        }
+    }
+
+    void HandlePlayerMovement()
     {
         // get input from horizontal and vertical axes
         float horizontal = Input.GetAxisRaw(horizontalInput);
@@ -96,6 +105,18 @@ public class PlayerController : MonoBehaviour
         {
             Quaternion targetRotation = Quaternion.LookRotation(movementDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+    }
+
+    // request the server to apply a movement change
+    [Rpc(SendTo.Server)]
+    void SubmitPositionRequestServerRpc(Vector3 newPosition)
+    {
+        // only update the position if the movement is from the server
+        if (IsServer)
+        {
+            var player = GetComponent<beachstickballPlayer>();
+            player.Position.Value = newPosition; // sync to all clients
         }
     }
 }

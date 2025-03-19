@@ -1,4 +1,3 @@
-using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,7 +10,6 @@ namespace beachstickball
         Button hostButton;
         Button clientButton;
         Button serverButton;
-        Button moveButton;
         Label statusLabel;
 
         void OnEnable()
@@ -22,20 +20,17 @@ namespace beachstickball
             hostButton = CreateButton("HostButton", "Host");
             clientButton = CreateButton("ClientButton", "Client");
             serverButton = CreateButton("ServerButton", "Server");
-            moveButton = CreateButton("MoveButton", "Move");
             statusLabel = CreateLabel("StatusLabel", "Not Connected");
             
-		    rootVisualElement.Clear();
+            rootVisualElement.Clear();
             rootVisualElement.Add(hostButton);
             rootVisualElement.Add(clientButton);
             rootVisualElement.Add(serverButton);
-            rootVisualElement.Add(moveButton);
             rootVisualElement.Add(statusLabel);
             
             hostButton.clicked += OnHostButtonClicked;
             clientButton.clicked += OnClientButtonClicked;
             serverButton.clicked += OnServerButtonClicked;
-            moveButton.clicked += SubmitNewPosition;
         }
 
         void Update()
@@ -48,7 +43,6 @@ namespace beachstickball
             hostButton.clicked -= OnHostButtonClicked;
             clientButton.clicked -= OnClientButtonClicked;
             serverButton.clicked -= OnServerButtonClicked;
-            moveButton.clicked -= SubmitNewPosition;
         }
 
         void OnHostButtonClicked() => NetworkManager.Singleton.StartHost();
@@ -57,8 +51,6 @@ namespace beachstickball
 
         void OnServerButtonClicked() => NetworkManager.Singleton.StartServer();
 
-        // Disclaimer: This is not the recommended way to create and stylize the UI elements, it is only utilized for the sake of simplicity.
-        // The recommended way is to use UXML and USS. Please see this link for more information: https://docs.unity3d.com/Manual/UIE-USS.html
         private Button CreateButton(string name, string text)
         {
             var button = new Button();
@@ -86,7 +78,6 @@ namespace beachstickball
             if (NetworkManager.Singleton == null)
             {
                 SetStartButtons(false);
-                SetMoveButton(false);
                 SetStatusText("NetworkManager not found");
                 return;
             }
@@ -94,13 +85,11 @@ namespace beachstickball
             if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
             {
                 SetStartButtons(true);
-                SetMoveButton(false);
                 SetStatusText("Not connected");
             }
             else
             {
                 SetStartButtons(false);
-                SetMoveButton(true);
                 UpdateStatusLabels();
             }
         }
@@ -112,15 +101,6 @@ namespace beachstickball
             serverButton.style.display = state ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        void SetMoveButton(bool state)
-        {
-            moveButton.style.display = state ? DisplayStyle.Flex : DisplayStyle.None;
-            if (state)
-            {
-                moveButton.text = NetworkManager.Singleton.IsServer ? "Move" : "Request Position Change";
-            }
-        }
-
         void SetStatusText(string text) => statusLabel.text = text;
 
         void UpdateStatusLabels()
@@ -129,25 +109,6 @@ namespace beachstickball
             string transport = "Transport: " + NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType().Name;
             string modeText = "Mode: " + mode;
             SetStatusText($"{transport}\n{modeText}");
-        }
-
-        void SubmitNewPosition()
-        {
-            if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
-            {
-                foreach (ulong uid in NetworkManager.Singleton.ConnectedClientsIds)
-                {
-                    var playerObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(uid);
-                    var player = playerObject.GetComponent<beachstickballPlayer>();
-                    player.Move();
-                }
-            }
-            else if (NetworkManager.Singleton.IsClient)
-            {
-                var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-                var player = playerObject.GetComponent<beachstickballPlayer>();
-                player.Move();
-            }
         }
     }
 }
