@@ -9,13 +9,9 @@ using UnityEngine;
 public class BallController : MonoBehaviour
 {
     public float drag = 0.5f;
-    private Rigidbody rb;
+    public Rigidbody rb;
 
     private Vector3 initialPosition;
-
-    // reference to court dimensions
-    public float courtWidth = 12.18f;
-    public float courtDepth = 21.02f;
 
     void Start()
     {

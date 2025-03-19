@@ -19,6 +19,10 @@ public class StickSwing : MonoBehaviour
     public Animator stickAnimator;
     public string swingAnimationTrigger = "swing";
 
+    // reference to court dimensions
+    private float courtWidth = 10f;
+    //private float courtDepth = 20f; // unused
+
     void Start()
     {
         originalRotation = stickTransform.localRotation;
@@ -85,7 +89,7 @@ public class StickSwing : MonoBehaviour
             if (ballController != null && isSwinging) // THEN, HIT THE BALL
             {
                 // calculate hit direction
-                Vector3 targetDirection = GetHitDirection(); // pseudo-random place to ensure landing within the court
+                Vector3 targetDirection = GetHitDirection(ballController); // pseudo-random place to ensure landing within the court
                 Vector3 hitDirection = targetDirection.normalized; // make direction unit vector
                 hitDirection.y = 1f; // make the ball go slightly upwards after the hit
 
@@ -95,23 +99,21 @@ public class StickSwing : MonoBehaviour
         }
     }
 
-    Vector3 GetHitDirection()
+    Vector3 GetHitDirection(BallController ballController)
     {
         string playerTag = gameObject.tag; // "Player 1" or "Player 2"
 
-        // Define fixed landing positions for Player 1 and Player 2
-        Vector3 player1Target = new Vector3(0, 0, -10); // Target position on Player 2's side
-        Vector3 player2Target = new Vector3(0, 0, 10); // Target position on Player 1's side
+        // define the court boundaries
+        float minX = -courtWidth / 2;
+        float maxX = courtWidth / 2;
 
-        if(playerTag == "Player 1")
-        {
-            return player1Target;
-        }
-        else if(playerTag == "Player 2")
-        {
-            return player2Target;
-        }
+        float randomX1 = Random.Range(0, maxX) - 1f; // to the right
+        float randomX2 = Random.Range(minX, 0) + 1f; // to the left
 
-        return Vector3.zero; // default
+        float midX = 0f; // center of the court
+        float targetX = (ballController.rb.position.x < midX) ? randomX1 : randomX2; // ball should always go toward the center of the court
+        float targetZ = (playerTag == "Player 1") ? -10f : 10f; // ball always goes towards the opponent's side
+
+        return new Vector3(targetX, 1f, targetZ);
     }
 }
