@@ -21,7 +21,6 @@ public class StickSwing : MonoBehaviour
 
     // reference to court dimensions
     private float courtWidth = 10f;
-    //private float courtDepth = 20f; // unused
 
     // audio
     public AudioSource audioSource;
