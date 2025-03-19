@@ -23,9 +23,15 @@ public class StickSwing : MonoBehaviour
     private float courtWidth = 10f;
     //private float courtDepth = 20f; // unused
 
+    // audio
+    public AudioSource audioSource;
+    public AudioClip swingSound; // slash sound effect
+    public AudioClip ballHitSound; // hit ball success
+
     void Start()
     {
         originalRotation = stickTransform.localRotation;
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -34,6 +40,9 @@ public class StickSwing : MonoBehaviour
         {
             StartCoroutine(SwingStick());
             stickAnimator.SetBool("swing", true);
+
+            // play slash sound
+            audioSource.PlayOneShot(swingSound);
         }
         else if (Input.GetKeyUp(KeyCode.X))
         {
@@ -88,6 +97,9 @@ public class StickSwing : MonoBehaviour
 
             if (ballController != null && isSwinging) // THEN, HIT THE BALL
             {
+                // play ball hit sound
+                audioSource.PlayOneShot(ballHitSound);
+
                 // calculate hit direction
                 Vector3 targetDirection = GetHitDirection(ballController); // pseudo-random place to ensure landing within the court
                 Vector3 hitDirection = targetDirection.normalized; // make direction unit vector
@@ -107,8 +119,8 @@ public class StickSwing : MonoBehaviour
         float minX = -courtWidth / 2;
         float maxX = courtWidth / 2;
 
-        float randomX1 = Random.Range(0, maxX) - 1f; // to the right
-        float randomX2 = Random.Range(minX, 0) + 1f; // to the left
+        float randomX1 = Random.Range(0, maxX) - 1f; // to the left
+        float randomX2 = Random.Range(minX, 0) + 1f; // to the right
 
         float midX = 0f; // center of the court
         float targetX = (ballController.rb.position.x < midX) ? randomX1 : randomX2; // ball should always go toward the center of the court

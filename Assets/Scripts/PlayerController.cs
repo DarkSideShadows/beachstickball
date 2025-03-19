@@ -28,6 +28,10 @@ public class PlayerController : MonoBehaviour
     public Transform characterModel; // reference to flamingo/frog character model
     public Vector3 characterModelOffset = new Vector3(0f, 1f, 0f);  // offset to move the character model downwards
 
+    // audio
+    public AudioSource audioSource;
+    public AudioClip jumpSound;
+
     void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -57,7 +61,6 @@ public class PlayerController : MonoBehaviour
         // adjust player's movement based on camera's orientation
         Vector3 movementDirection = cameraForward * vertical + cameraRight * horizontal;
         movementDirection.Normalize(); // normalize to prevent faster diagonal movement
-
         movement = movementDirection * moveSpeed * Time.deltaTime;
 
         // jumping and gravity
@@ -65,7 +68,12 @@ public class PlayerController : MonoBehaviour
         {
             verticalVelocity = -2f; // keep the player grounded
             if(Input.GetButtonDown("Jump")) // default is spacebar
+            {
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+                // play jump noise
+                audioSource.PlayOneShot(jumpSound);
+            }
         }
         else
         {

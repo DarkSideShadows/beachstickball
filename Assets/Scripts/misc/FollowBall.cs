@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/* make character look at volleyball */
+/* make character (peanut) look at volleyball */
 public class FollowBall : MonoBehaviour
 {
     public Transform ball;
