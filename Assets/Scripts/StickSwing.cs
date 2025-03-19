@@ -7,14 +7,17 @@ using UnityEngine;
 */
 public class StickSwing : MonoBehaviour
 {
-    // stick swing animatino
-    public Transform stickTransform; // stick
+    // stick swing (only for stick)
+    public Transform stickTransform;
     public float swingSpeed = 10f;
     public float swingAngle = 45;
+    public float hitForce = 5f;
     private bool isSwinging = false;
     private Quaternion originalRotation;
 
-    public float hitForce = 5f;
+    // animation for swing (including arm)
+    public Animator stickAnimator;
+    public string swingAnimationTrigger = "swing";
 
     void Start()
     {
@@ -26,6 +29,11 @@ public class StickSwing : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.X) && !isSwinging) // X to swing stick
         {
             StartCoroutine(SwingStick());
+            stickAnimator.SetBool("swing", true);
+        }
+        else if (Input.GetKeyUp(KeyCode.X))
+        {
+            stickAnimator.SetBool("swing", false);
         }
     }
 
