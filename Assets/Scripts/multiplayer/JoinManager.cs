@@ -4,7 +4,8 @@ using UnityEngine.UIElements;
 
 namespace beachstickball
 {
-    public class beachstickballManager : MonoBehaviour
+    /* UI elements for joining as host/client/server */
+    public class JoinManager : MonoBehaviour
     {
         VisualElement rootVisualElement;
         Button hostButton;
