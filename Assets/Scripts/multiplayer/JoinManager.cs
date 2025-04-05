@@ -1,108 +1,58 @@
-using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using TMPro;
+using System.Net;
+using System.Net.Sockets;
 
-namespace beachstickball
+public class JoinManager : MonoBehaviour
 {
-    /* UI elements for joining as host/client/server */
-    public class JoinManager : MonoBehaviour
-    {
-        VisualElement rootVisualElement;
-        Button hostButton;
-        Button clientButton;
-        Label statusLabel;
+	[SerializeField] TextMeshProUGUI ipAddressText;
+	[SerializeField] TMP_InputField ip;
 
-        void OnEnable()
-        {
-            var uiDocument = GetComponent<UIDocument>();
-            rootVisualElement = uiDocument.rootVisualElement;
-            
-            hostButton = CreateButton("HostButton", "Host");
-            clientButton = CreateButton("ClientButton", "Client");
-            statusLabel = CreateLabel("StatusLabel", "Not Connected");
-            
-            rootVisualElement.Clear();
-            rootVisualElement.Add(hostButton);
-            rootVisualElement.Add(clientButton);
-            rootVisualElement.Add(statusLabel);
-            
-            hostButton.clicked += OnHostButtonClicked;
-            clientButton.clicked += OnClientButtonClicked;
-        }
+	[SerializeField] string ipAddress;
+	[SerializeField] UnityTransport transport;
 
-        void Update()
-        {
-            UpdateUI();
-        }
-        
-        void OnDisable()
-        {
-            hostButton.clicked -= OnHostButtonClicked;
-            clientButton.clicked -= OnClientButtonClicked;
-        }
+	void Start()
+	{
+		ipAddress = "0.0.0.0";
+		SetIpAddress(); // Set the Ip to the above address
+	}
 
-        void OnHostButtonClicked() => NetworkManager.Singleton.StartHost();
+	// To Host a game
+	public void StartHost() {
+		NetworkManager.Singleton.StartHost();
+		GetLocalIPAddress();
+	}
 
-        void OnClientButtonClicked() => NetworkManager.Singleton.StartClient();
+	// To Join a game
+	public void StartClient() {
+		ipAddress = ip.text;
+		SetIpAddress();
+		NetworkManager.Singleton.StartClient();
+	}
 
+	/* Gets the Ip Address of your connected network and
+	shows on the screen in order to let other players join
+	by inputing that Ip in the input field */
+	// ONLY FOR HOST SIDE 
+	public string GetLocalIPAddress() {
+		var host = Dns.GetHostEntry(Dns.GetHostName());
+		foreach (var ip in host.AddressList) {
+			if (ip.AddressFamily == AddressFamily.InterNetwork) {
+				ipAddressText.text = ip.ToString();
+				ipAddress = ip.ToString();
+				return ip.ToString();
+			}
+		}
+		throw new System.Exception("No network adapters with an IPv4 address in the system!");
+	}
 
-        private Button CreateButton(string name, string text)
-        {
-            var button = new Button();
-            button.name = name;
-            button.text = text;
-            button.style.width = 240;
-            button.style.backgroundColor = Color.white;
-            button.style.color = Color.black;
-            button.style.unityFontStyleAndWeight = FontStyle.Bold;
-            return button;
-        }
-
-        private Label CreateLabel(string name, string content)
-        {
-            var label = new Label();
-            label.name = name;
-            label.text = content;
-            label.style.color = Color.black;
-            label.style.fontSize = 18;
-            return label;
-        }
-
-        void UpdateUI()
-        {
-            if (NetworkManager.Singleton == null)
-            {
-                SetStartButtons(false);
-                SetStatusText("NetworkManager not found");
-                return;
-            }
-
-            if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
-            {
-                SetStartButtons(true);
-                SetStatusText("Not connected");
-            }
-            else
-            {
-                SetStartButtons(false);
-                UpdateStatusLabels();
-            }
-        }
-
-        void SetStartButtons(bool state)
-        {
-            hostButton.style.display = state ? DisplayStyle.Flex : DisplayStyle.None;
-            clientButton.style.display = state ? DisplayStyle.Flex : DisplayStyle.None;
-        }
-
-        void SetStatusText(string text) => statusLabel.text = text;
-
-        void UpdateStatusLabels()
-        {
-            var mode = NetworkManager.Singleton.IsHost ? "Host" : NetworkManager.Singleton.IsServer ? "Server" : "Client";
-            string transport = "Transport: " + NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType().Name;
-            string modeText = "Mode: " + mode;
-            SetStatusText($"{transport}\n{modeText}");
-        }
-    }
+	/* Sets the Ip Address of the Connection Data in Unity Transport
+	to the Ip Address which was input in the Input Field */
+	// ONLY FOR CLIENT SIDE
+	public void SetIpAddress() {
+		transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+		transport.ConnectionData.Address = ipAddress;
+	}
 }
