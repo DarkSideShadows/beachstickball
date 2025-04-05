@@ -108,7 +108,7 @@ public class BallController : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Ball collided with: " + collision.gameObject.name);
+        // Debug.Log("Ball collided with: " + collision.gameObject.name);
         // collision with anything but stick results in game loss
         if (collision.gameObject.name == "sand" || collision.gameObject.name == "FLOOR" || collision.gameObject.name == "NET")
         {

@@ -35,7 +35,7 @@ public class PlayerSpawner : MonoBehaviour
         {
             GameObject hostPlayer = Instantiate(hostPrefab, hostSpawnPosition, Quaternion.identity);
             hostPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.LocalClientId);
-            Debug.Log($"Spawning host player for client ID: {NetworkManager.Singleton.LocalClientId}");
+            // Debug.Log($"Spawning host player for client ID: {NetworkManager.Singleton.LocalClientId}");
         }
     }
 
@@ -51,6 +51,6 @@ public class PlayerSpawner : MonoBehaviour
         GameObject clientPlayer = Instantiate(clientPrefab, clientSpawnPosition, Quaternion.identity);
         NetworkObject netObj = clientPlayer.GetComponent<NetworkObject>();
         netObj.SpawnAsPlayerObject(clientId); // spawn client-owned player
-        Debug.Log($"Spawned client prefab. Owner is: {netObj.OwnerClientId}");
+        // Debug.Log($"Spawned client prefab. Owner is: {netObj.OwnerClientId}");
     }
 }

@@ -10,7 +10,6 @@ namespace beachstickball
         VisualElement rootVisualElement;
         Button hostButton;
         Button clientButton;
-        Button serverButton;
         Label statusLabel;
 
         void OnEnable()
@@ -20,18 +19,15 @@ namespace beachstickball
             
             hostButton = CreateButton("HostButton", "Host");
             clientButton = CreateButton("ClientButton", "Client");
-            serverButton = CreateButton("ServerButton", "Server");
             statusLabel = CreateLabel("StatusLabel", "Not Connected");
             
             rootVisualElement.Clear();
             rootVisualElement.Add(hostButton);
             rootVisualElement.Add(clientButton);
-            rootVisualElement.Add(serverButton);
             rootVisualElement.Add(statusLabel);
             
             hostButton.clicked += OnHostButtonClicked;
             clientButton.clicked += OnClientButtonClicked;
-            serverButton.clicked += OnServerButtonClicked;
         }
 
         void Update()
@@ -43,14 +39,12 @@ namespace beachstickball
         {
             hostButton.clicked -= OnHostButtonClicked;
             clientButton.clicked -= OnClientButtonClicked;
-            serverButton.clicked -= OnServerButtonClicked;
         }
 
         void OnHostButtonClicked() => NetworkManager.Singleton.StartHost();
 
         void OnClientButtonClicked() => NetworkManager.Singleton.StartClient();
 
-        void OnServerButtonClicked() => NetworkManager.Singleton.StartServer();
 
         private Button CreateButton(string name, string text)
         {
@@ -99,7 +93,6 @@ namespace beachstickball
         {
             hostButton.style.display = state ? DisplayStyle.Flex : DisplayStyle.None;
             clientButton.style.display = state ? DisplayStyle.Flex : DisplayStyle.None;
-            serverButton.style.display = state ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         void SetStatusText(string text) => statusLabel.text = text;
