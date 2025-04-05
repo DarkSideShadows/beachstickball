@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 
+/* speech bubble for the peanut man */
 public class SpeechBubbleController : MonoBehaviour
 {
     public GameObject speechBubble;
@@ -8,13 +9,14 @@ public class SpeechBubbleController : MonoBehaviour
 
     void Start()
     {
-        speechBubble.SetActive(false); // initially hide the speech bubble
+        speechBubble.SetActive(false);
     }
 
     public void ShowSpeechBubble(string message)
     {
-        speechText.text = message; // set the speech bubble text
-        speechBubble.SetActive(true); // show the speech bubble
+        speechText.text = message;
+        speechBubble.SetActive(true);
+
     }
 
     public void HideSpeechBubble()

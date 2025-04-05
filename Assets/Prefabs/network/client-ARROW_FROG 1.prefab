@@ -1648,7 +1648,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4, y: 4, z: 4}
+  m_Size: {x: 7, y: 7, z: 7}
   m_Center: {x: 0.000000059604645, y: -0.0000009536743, z: -0.0000005662441}
 --- !u!114 &5646722708166550520
 MonoBehaviour:
@@ -1666,8 +1666,6 @@ MonoBehaviour:
   swingSpeed: 10
   swingAngle: 45
   hitForce: 5
-  stickAnimator: {fileID: 1856548199032331682}
-  swingAnimationTrigger: swing
   audioSource: {fileID: 4846349744199465652}
   swingSound: {fileID: 8300000, guid: 6f5da88522e149c4c9dfc448a3cf3e5a, type: 3}
   ballHitSound: {fileID: 8300000, guid: e7a4fb99e57c18b4fb9fe8c652df92de, type: 3}
@@ -2004,7 +2002,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 221190580
+  GlobalObjectIdHash: 2680988744
   InScenePlacedSourceGlobalObjectIdHash: 2549126468
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2026,12 +2024,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterModel: {fileID: 2051063111988737190}
-  moveSpeed: 4
-  jumpHeight: 3
-  gravity: -9.8
   horizontalInput: Horizontal2
   verticalInput: Vertical2
+  moveSpeed: 5
   rotationSpeed: 10
+  gravity: -9.8
+  jumpHeight: 3
   audioSource: {fileID: 7252582910190609349}
   jumpSound: {fileID: 8300000, guid: ba47e1dd0ac6dfb488934a782fc9eb3b, type: 3}
 --- !u!95 &1856548199032331682

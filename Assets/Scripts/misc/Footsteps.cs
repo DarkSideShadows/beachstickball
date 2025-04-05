@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Footsteps : MonoBehaviour
@@ -18,14 +16,11 @@ public class Footsteps : MonoBehaviour
         float horizontal = Input.GetAxis(playerController.horizontalInput);
         float vertical = Input.GetAxis(playerController.verticalInput);
 
-        if (Mathf.Abs(horizontal) > 0.1f || Mathf.Abs(vertical) > 0.1f)  // check speed
-        {
+        // check speed
+        if (Mathf.Abs(horizontal) > 0.1f || Mathf.Abs(vertical) > 0.1f)
             footsteps();
-        }
         else 
-        {
             StopFootsteps();
-        }
     }
 
     void footsteps()

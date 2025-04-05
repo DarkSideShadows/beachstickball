@@ -1,27 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode.Components;
+using Unity.Netcode;
 using UnityEngine;
+using System.Collections;
 
-/* volleball should be like a light beachball
- * this script ensures physics interactions
- * and controls ball movement with forces based on player interaction
+/*
+    this script determines the gameOver flag
+    - disables input for both players
+    - asks to play again, displays score
+
+    only the server should control the ball
+    - ball is synced across clients
+    - reset + force application happens server-side
  */
-public class BallController : MonoBehaviour
+public class BallController : NetworkBehaviour
 {
-    public float drag = 0.5f;
-    public float initialThrowForce = 5f;
-    public Rigidbody rb; // accessed by stickSwing to determine hitDirection
+    public Rigidbody rb;
     private Vector3 initialPosition;
 
-    // counter for number of hits
+    // game over logic
+    public SpeechBubbleController speechBubbleController; // display score, ask to play again
     public int hitCount = 0;
-
-    // flag to check if game is going on
     private bool gameOver = false;
+    private bool first = true;
 
-    public SpeechBubbleController speechBubbleController;
-    public PlayerController playerController1;
-    public PlayerController playerController2;
+    // tunables
+    public float drag = 0.5f;
+    public float initialThrowForce = 5f;
 
     // audio
     public AudioSource audioSource;
@@ -31,11 +35,11 @@ public class BallController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = true; // re-enable gravity
-        rb.linearDamping = drag; // smoother, slower movement
-        rb.angularDamping = drag; // natural spin
+        rb.isKinematic = true; // freeze ball
+        rb.useGravity = false; // freeze ball
 
-        initialPosition = rb.position;
+        // set spawn position and note for reset
+        initialPosition = transform.position;
     }
 
     void Update()
@@ -44,40 +48,67 @@ public class BallController : MonoBehaviour
             ResetBallPosition();
     }
 
-    // for playtesting
+    // resetting ball after failed attempt
     public void ResetBallPosition()
     {
         // reset game state
         hitCount = 0;
         gameOver = false;
-        speechBubbleController.HideSpeechBubble();
-        playerController1.enabled = true;
-        playerController2.enabled = true;
 
-        rb.position = initialPosition;
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        // throw ball upwards
-        rb.AddForce(Vector3.up * initialThrowForce, ForceMode.Impulse); // apply upward force
+        // server
+        ActivateBallServerRpc();     // resets ball position and physics
+        HideSpeechBubbleClientRpc(); // hides speech bubble on all clients
     }
 
-    // when ball is hit by player or object
-    public void ApplyHitForce(Vector3 direction, float hitStrength)
+    [ServerRpc(RequireOwnership = false)]
+    public void ActivateBallServerRpc(ServerRpcParams rpcParams = default) // spawn ball when we start game
     {
-        Debug.Log("Ball hit with stick");
-        Debug.Log("Applying force: " + direction * hitStrength);
+        if (first)
+        {
+            ActivateBallClientRpc(); // tell clients to activate volleyball visuals
+            first = false;
+        }
 
-        rb.linearVelocity = Vector3.zero; // reset velocity before applying force
-        rb.angularVelocity = Vector3.zero; // prevent unwanted spin
+        // 1. stop physics before resetting
+        rb.isKinematic = true;
+        rb.useGravity = false;
+
+        // 2. teleport the ball
+        GetComponent<NetworkTransform>().Teleport(initialPosition, transform.rotation, transform.localScale);
+
+        // 3. wait one physics frame before reactivating
+        StartCoroutine(ResumeAfterReset());
+    }
+
+    IEnumerator ResumeAfterReset()
+    {
+        yield return new WaitForFixedUpdate();
+
+        rb.isKinematic = false;
+        rb.useGravity = true;
+
+        rb.AddForce(Vector3.up * initialThrowForce, ForceMode.Impulse);
+    }
+
+    [ClientRpc]
+    void ActivateBallClientRpc()
+    {
+        GetComponentInChildren<MeshRenderer>().enabled = true;
+        GetComponent<Collider>().enabled = true;
+    }
+
+    [ServerRpc(RequireOwnership = false)] // ownership = false, client can hit the ball
+    public void ApplyHitForceServerRpc(Vector3 direction, float hitStrength) // when ball is hit by player or object
+    {
+        rb.linearVelocity = Vector3.zero;   // reset velocity before applying force
+        rb.angularVelocity = Vector3.zero;  // prevent unwanted spin
         rb.AddForce(direction * hitStrength, ForceMode.Impulse);
-
         hitCount++;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        //Debug.Log("Ball collided with: " + collision.gameObject.name);
+        Debug.Log("Ball collided with: " + collision.gameObject.name);
         // collision with anything but stick results in game loss
         if (collision.gameObject.name == "sand" || collision.gameObject.name == "FLOOR" || collision.gameObject.name == "NET")
         {
@@ -88,13 +119,23 @@ public class BallController : MonoBehaviour
             Invoke("PlayWhistle", 0.5f);
 
             // display result
-            speechBubbleController.ShowSpeechBubble($"You got {hitCount} hits, press R to reset!");
+            ShowSpeechBubbleClientRpc($"You got {hitCount} hits, press R to reset!");
 
             // wait for player to reset
             gameOver = true;
-            playerController1.enabled = false; // disable player input
-            playerController2.enabled = false; // disable player input
         }
+    }
+
+    [ClientRpc]
+    void ShowSpeechBubbleClientRpc(string message)
+    {
+        speechBubbleController.ShowSpeechBubble(message);
+    }
+
+    [ClientRpc]
+    void HideSpeechBubbleClientRpc()
+    {
+        speechBubbleController.HideSpeechBubble();
     }
 
     void PlayWhistle()

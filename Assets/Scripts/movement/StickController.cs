@@ -1,57 +1,56 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-/* trigger swing animation
-*  interact with the volleyball
-*/
-public class StickSwing : MonoBehaviour
+/* trigger swing animation interact with the volleyball */
+public class StickController : MonoBehaviour
 {
-    // stick swing (only for stick)
+    private PlayerController playerController;
+
+    // external tunables for stick animation
     public Transform stickTransform;
     public float swingSpeed = 10f;
     public float swingAngle = 45;
     public float hitForce = 5f;
-    private bool isSwinging = false;
+    public bool isSwinging { get; private set; }
+
+    // constants
+    private float courtWidth = 2f;
     private Quaternion originalRotation;
-
-    // animation for swing (including arm)
-    public Animator stickAnimator;
-    public string swingAnimationTrigger = "swing";
-
-    // reference to court dimensions
-    private float courtWidth = 10f;
 
     // audio
     public AudioSource audioSource;
-    public AudioClip swingSound; // slash sound effect
+    public AudioClip swingSound;   // slash sound effect
     public AudioClip ballHitSound; // hit ball success
 
     void Start()
     {
         originalRotation = stickTransform.localRotation;
         audioSource = GetComponent<AudioSource>();
+        playerController = GetComponentInParent<PlayerController>();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.X) && !isSwinging) // X to swing stick
-        {
-            StartCoroutine(SwingStick());
-            stickAnimator.SetBool("swing", true);
+        // remove controls for non-owned objects
+        if (playerController == null || !playerController.IsOwner) return;
 
-            // play slash sound
+        if (Input.GetKeyDown(KeyCode.X) && !isSwinging)
+        {
+            StartCoroutine(SwingStick());           // handle stick motion
+            StartCoroutine(ResetSwingAnimFlag());   // handle arm animation
             audioSource.PlayOneShot(swingSound);
         }
-        else if (Input.GetKeyUp(KeyCode.X))
-        {
-            stickAnimator.SetBool("swing", false);
-        }
+    }
+
+    IEnumerator ResetSwingAnimFlag()
+    {
+        yield return new WaitForSeconds(0.2f); // duration of punch animation
+        isSwinging = false;                    // animation ends early (allows transition to other animation)
     }
 
     IEnumerator SwingStick()
     {
-        isSwinging = true; // mark swinging animation (prevent multiple from happening at the same time)
+        isSwinging = true; // start swinging animation (prevent multiple from happening at the same time)
 
         /// swing forward ///
         float elapsedTime = 0f;
@@ -100,30 +99,24 @@ public class StickSwing : MonoBehaviour
                 audioSource.PlayOneShot(ballHitSound);
 
                 // calculate hit direction
-                Vector3 targetDirection = GetHitDirection(ballController); // pseudo-random place to ensure landing within the court
+                Vector3 targetDirection = GetHitDirection(); // pseudo-random place to ensure landing within the court
                 Vector3 hitDirection = targetDirection.normalized; // make direction unit vector
-                hitDirection.y = 1f; // make the ball go slightly upwards after the hit
 
                 // apply force to ball with the new direction
-                ballController.ApplyHitForce(hitDirection, hitForce);
+                ballController.ApplyHitForceServerRpc(hitDirection, hitForce);
             }
         }
     }
 
-    Vector3 GetHitDirection(BallController ballController)
+    Vector3 GetHitDirection()
     {
         string playerTag = gameObject.tag; // "Player 1" or "Player 2"
 
         // define the court boundaries
-        float minX = -courtWidth / 2;
-        float maxX = courtWidth / 2;
-
-        float randomX1 = Random.Range(0, maxX) - 1f; // to the left
-        float randomX2 = Random.Range(minX, 0) + 1f; // to the right
-
-        float midX = 0f; // center of the court
-        float targetX = (ballController.rb.position.x < midX) ? randomX1 : randomX2; // ball should always go toward the center of the court
-        float targetZ = (playerTag == "Player 1") ? -10f : 10f; // ball always goes towards the opponent's side
+        float minX = -courtWidth / 2 + 0.5f;
+        float maxX =  courtWidth / 2 - 0.5f;
+        float targetX = Random.Range(minX, maxX); // consistent randomness per player
+        float targetZ = (playerTag == "Player 1") ? -1f : 1f; // ball always goes towards the opponent's side
 
         return new Vector3(targetX, 1f, targetZ);
     }

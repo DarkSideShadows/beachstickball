@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour
 {
-    public GameObject hostPrefab;  // flamingo prefab for host
+    public GameObject hostPrefab;   // flamingo prefab for host
     public GameObject clientPrefab; // frog prefab for client
 
-    Vector3 clientSpawnPosition = new Vector3(0.2f, 0.3f, -7);
-    Vector3 hostSpawnPosition = new Vector3(-0.2f, 0.3f, 5.5f);
+    Vector3 clientSpawnPosition = new Vector3(0.2f, -1f, -7);
+    Vector3 hostSpawnPosition = new Vector3(-0.2f, -1f, 5.5f);
 
     private void Start()
     {
@@ -48,7 +48,6 @@ public class PlayerSpawner : MonoBehaviour
         // if the joining client is the host, don't spawn a client prefab (host is also a client)
         if (clientId == NetworkManager.Singleton.LocalClientId && NetworkManager.Singleton.IsHost) return;
 
-        Debug.Log($"Attempting to spawn client prefab for clientId: {clientId}");
         GameObject clientPlayer = Instantiate(clientPrefab, clientSpawnPosition, Quaternion.identity);
         NetworkObject netObj = clientPlayer.GetComponent<NetworkObject>();
         netObj.SpawnAsPlayerObject(clientId); // spawn client-owned player
