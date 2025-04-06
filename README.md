@@ -20,7 +20,7 @@ This game was made with Unity for the multiplayer project for Prof. Fodor's 3D g
 - Join with client instance SECOND: input said IP address in input field and press client button
 - Read instructions and play the game
 
-- If all else fails, I've also added the [build file here](https://drive.google.com/drive/folders/1HS45Z8PUpDI1Ryit6QgYP9z1vROsJKTy?usp=sharing). This contains the .exe to run the application - it's titled "multiplyer.exe". Run it twice - for host and client - and follow instructions for setup above.
+- If all else fails, I've also added the [build folder here](https://drive.google.com/drive/folders/1HS45Z8PUpDI1Ryit6QgYP9z1vROsJKTy?usp=sharing). This contains the .exe to run the application - it's titled "multiplyer.exe". First download the folder on your computer. Then run multiplayer.exe twice - for host and client - and follow instructions for setup above.
 
 ## NetCode from Unity tutorial:  
 * For multiplayer tutorial: https://learn.unity.com/tutorial/get-started-with-netcode-for-gameobjects#66881213edbc2a14bb67be9e
